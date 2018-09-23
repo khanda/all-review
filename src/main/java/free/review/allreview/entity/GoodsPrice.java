@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-public class GoodsByDate {
+public class GoodsPrice {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -18,11 +18,11 @@ public class GoodsByDate {
     @JoinColumn(name = "goods_id")
     private Goods goods;
 
-    public GoodsByDate() {
+    public GoodsPrice() {
     }
 
 
-    public GoodsByDate(Float price, Date date, Goods goods) {
+    public GoodsPrice(Float price, Date date, Goods goods) {
         this.price = price;
         this.date = date;
         this.goods = goods;
