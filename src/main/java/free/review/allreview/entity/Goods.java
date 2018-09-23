@@ -1,9 +1,10 @@
 package free.review.allreview.entity;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
-public class Goods {
+public class Goods implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -11,6 +12,7 @@ public class Goods {
     private String name;
 
     public Goods() {
+
     }
 
     public Goods(String name) {
