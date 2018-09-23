@@ -1,6 +1,7 @@
 package free.review.allreview.service;
 
 import free.review.allreview.entity.Goods;
+import free.review.allreview.exceptions.ConstraintException;
 import free.review.allreview.exceptions.DuplicatedException;
 import free.review.allreview.exceptions.MissingInfoException;
 import free.review.allreview.exceptions.NotFoundException;
@@ -79,7 +80,12 @@ public class GoodsServiceImpl implements GoodsService {
     public ResponseEntity<Goods> delete(Long id) {
 
         Goods existingContact = findIfExists(id);
-        goodsRepository.delete(existingContact);
+        try {
+            goodsRepository.delete(existingContact);
+        } catch (Exception e) {
+            throw new ConstraintException();
+        }
+
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

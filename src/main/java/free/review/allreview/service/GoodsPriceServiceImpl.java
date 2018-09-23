@@ -2,6 +2,7 @@ package free.review.allreview.service;
 
 import free.review.allreview.entity.Goods;
 import free.review.allreview.entity.GoodsPrice;
+import free.review.allreview.exceptions.ConstraintException;
 import free.review.allreview.exceptions.DuplicatedException;
 import free.review.allreview.exceptions.MissingInfoException;
 import free.review.allreview.exceptions.NotFoundException;
@@ -122,7 +123,5 @@ public class GoodsPriceServiceImpl implements GoodsPriceService {
                         goodsPrice.getDate());
 
         return null != goodsCollection && !goodsCollection.isEmpty();
-//
-//        return false;
     }
 }
