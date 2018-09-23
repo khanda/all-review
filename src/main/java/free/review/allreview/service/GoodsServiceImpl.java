@@ -38,7 +38,7 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Override
     public ResponseEntity<Goods> getOneResponse(Long id) {
-        Goods getContact = findContactIfExists(id);
+        Goods getContact = findIfExists(id);
         return new ResponseEntity<>(getContact, HttpStatus.OK);
     }
 
@@ -62,7 +62,7 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Override
     public ResponseEntity<Goods> putUpdate(Long id, Goods customer) {
-        Goods existingContact = findContactIfExists(id);
+        Goods existingContact = findIfExists(id);
 
         if (isMissingInfo(customer)) {
             throw new MissingInfoException();
@@ -78,13 +78,13 @@ public class GoodsServiceImpl implements GoodsService {
     @Override
     public ResponseEntity<Goods> delete(Long id) {
 
-        Goods existingContact = findContactIfExists(id);
+        Goods existingContact = findIfExists(id);
         goodsRepository.delete(existingContact);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 
-    private Goods findContactIfExists(Long id) {
+    private Goods findIfExists(Long id) {
         Optional<Goods> existingContact = goodsRepository.findById(id);
 
         if (existingContact.isPresent()) {
