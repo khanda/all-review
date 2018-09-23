@@ -67,14 +67,22 @@ public class GoodsPriceServiceImpl implements GoodsPriceService {
 
 
     @Override
-    public ResponseEntity<GoodsPrice> putUpdate(Long id, GoodsPrice customer) {
+    public ResponseEntity<GoodsPrice> putUpdate(Long id, GoodsPrice goodsPrice) {
         GoodsPrice existingContact = findContactIfExists(id);
 
-        if (isMissingInfo(customer)) {
+        if (isMissingInfo(goodsPrice)) {
             throw new MissingInfoException();
         }
 
-        BeanUtils.copyProperties(customer, existingContact);
+        Optional<Goods> goods = goodsRepository.findById(goodsPrice.getTransientGoodsId());
+        if (goods.isPresent()) {
+            goodsPrice.setGoods(goods.get());
+        } else {
+            throw new MissingInfoException();
+        }
+
+
+        BeanUtils.copyProperties(goodsPrice, existingContact);
         existingContact.setId(id);
         GoodsPrice updatedContact = goodsPriceRepository.save(existingContact);
 
@@ -108,13 +116,13 @@ public class GoodsPriceServiceImpl implements GoodsPriceService {
     }
 
     private boolean isExisted(GoodsPrice goodsPrice) {
-//        Collection<GoodsPrice> goodsCollection = goodsPriceRepository
-//                .findByGoodsIdAndDate(
-//                        goodsPrice.getTransientGoodsId(),
-//                        goodsPrice.getDate().toString());
-//
-//        return null != goodsCollection && !goodsCollection.isEmpty();
+        Collection<GoodsPrice> goodsCollection = goodsPriceRepository
+                .findByGoodsIdAndDate(
+                        goodsPrice.getTransientGoodsId(),
+                        goodsPrice.getDate());
 
-        return false;
+        return null != goodsCollection && !goodsCollection.isEmpty();
+//
+//        return false;
     }
 }
