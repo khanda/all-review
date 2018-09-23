@@ -4,6 +4,8 @@ import free.review.allreview.entity.Customer;
 import free.review.allreview.exceptions.CustomerNotFoundException;
 import free.review.allreview.exceptions.MissingCustomerInfoException;
 import free.review.allreview.repository.CustomerRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -19,6 +21,7 @@ import java.util.Optional;
 public class CustomerServiceImpl implements CustomerService {
 
     private CustomerRepository customerRepository;
+    private static final Logger logger = LoggerFactory.getLogger(CustomerServiceImpl.class);
 
     @Autowired
     public CustomerServiceImpl(CustomerRepository customerRepository) {
@@ -42,13 +45,14 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public ResponseEntity<Customer> createNewContact(Customer customer, HttpServletRequest request) {
-        if (null != customer.getName() && customer.getName().length() > 0) {
-            Customer newContact = customerRepository.save(customer);
+        try {
+            Customer newCustomer = customerRepository.save(customer);
             HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("Location", contactUrlHelper(newContact, request));
+            responseHeaders.set("Location", newCustomer.getId().toString());
 
-            return new ResponseEntity<>(newContact, responseHeaders, HttpStatus.CREATED);
-        } else {
+            return new ResponseEntity<>(newCustomer, responseHeaders, HttpStatus.CREATED);
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage());
             throw new MissingCustomerInfoException();
         }
     }
@@ -95,16 +99,6 @@ public class CustomerServiceImpl implements CustomerService {
         Customer existingContact = findContactIfExists(id);
         customerRepository.delete(existingContact);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    private String contactUrlHelper(Customer customer, HttpServletRequest request) {
-        StringBuilder resourcePath = new StringBuilder();
-
-        resourcePath.append(request.getRequestURL());
-        resourcePath.append("/");
-        resourcePath.append(customer.getId());
-
-        return resourcePath.toString();
     }
 
     private Customer findContactIfExists(Long id) {

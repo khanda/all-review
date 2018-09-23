@@ -5,6 +5,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Entity
@@ -14,8 +16,11 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column
+    @NotNull
     private String name;
     @Column
+    @NotNull
+    @Size(min = 1)
     private String phone;
 
     @Column
