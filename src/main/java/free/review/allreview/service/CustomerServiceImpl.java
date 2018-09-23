@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -27,8 +27,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public ResponseEntity<List<Customer>> getAllContactsResponse() {
-        List<Customer> allContacts = customerRepository.findAll();
+    public ResponseEntity<Iterable<Customer>> getAllContactsResponse() {
+        Iterable<Customer> allContacts = customerRepository.findAll();
 
         return new ResponseEntity<>(allContacts, HttpStatus.OK);
 
@@ -43,7 +43,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public ResponseEntity<Customer> createNewContact(Customer customer, HttpServletRequest request) {
         if (null != customer.getName() && customer.getName().length() > 0) {
-            Customer newContact = customerRepository.saveAndFlush(customer);
+            Customer newContact = customerRepository.save(customer);
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.set("Location", contactUrlHelper(newContact, request));
 
@@ -68,7 +68,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
 
-        Customer updatedContact = customerRepository.saveAndFlush(existingContact);
+        Customer updatedContact = customerRepository.save(existingContact);
         return new ResponseEntity<>(updatedContact, HttpStatus.OK);
 
 
@@ -83,7 +83,8 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         BeanUtils.copyProperties(customer, existingContact);
-        Customer updatedContact = customerRepository.saveAndFlush(existingContact);
+        existingContact.setId(id);
+        Customer updatedContact = customerRepository.save(existingContact);
 
         return new ResponseEntity<>(updatedContact, HttpStatus.OK);
     }
@@ -107,10 +108,10 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     private Customer findContactIfExists(Long id) {
-        Customer existingContact = customerRepository.getOne(id);
+        Optional<Customer> existingContact = customerRepository.findById(id);
 
-        if (null != existingContact.getId()) {
-            return existingContact;
+        if (existingContact.isPresent()) {
+            return existingContact.get();
         } else {
             throw new CustomerNotFoundException();
         }

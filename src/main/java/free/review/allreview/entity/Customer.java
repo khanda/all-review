@@ -1,6 +1,7 @@
 package free.review.allreview.entity;
 
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -22,14 +23,20 @@ public class Customer {
     @CreatedDate
     private Date createdDate;
 
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    @LastModifiedDate
+    private Date updatedDate;
+
 
     public Customer() {
     }
 
-    public Customer(String name, String phone, Date createdDate) {
+    public Customer(String name, String phone, Date createdDate, Date updatedDate) {
         this.name = name;
         this.phone = phone;
         this.createdDate = createdDate;
+        this.updatedDate = updatedDate;
     }
 
     public Long getId() {
@@ -62,5 +69,13 @@ public class Customer {
 
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
     }
 }

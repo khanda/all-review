@@ -17,7 +17,7 @@ public class CustomerCtrl {
 
     // List All Contacts
     @RequestMapping(value = "customers", method = RequestMethod.GET)
-    public ResponseEntity<List<Customer>> getAllContacts() throws Throwable {
+    public ResponseEntity<Iterable<Customer>> getAllContacts() throws Throwable {
         return customerService.getAllContactsResponse();
     }
 

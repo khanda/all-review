@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface CustomerService {
-    ResponseEntity<List<Customer>> getAllContactsResponse();
+    ResponseEntity<Iterable<Customer>> getAllContactsResponse();
 
     ResponseEntity<Customer> getSingleContactResponse(Long id);
 
