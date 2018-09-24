@@ -1,9 +1,12 @@
 package free.review.allreview.service;
 
+import free.review.allreview.BusinessConfig.CustomerConfig;
 import free.review.allreview.entity.Customer;
 import free.review.allreview.exceptions.CustomerNotFoundException;
 import free.review.allreview.exceptions.MissingCustomerInfoException;
+import free.review.allreview.exceptions.NotAllowChangeException;
 import free.review.allreview.repository.CustomerRepository;
+import free.review.allreview.utils.MyBeanUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -15,6 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -59,23 +65,31 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public ResponseEntity<Customer> patchUpdateContact(Long id, Customer customer) {
-        Customer existingContact = findContactIfExists(id);
-        if (isMissingInfo(customer)) {
-            throw new MissingCustomerInfoException();
+        List<String> notAllowChange = filterNotAllowChange(customer);
+        if (null != notAllowChange && !notAllowChange.isEmpty()) {
+            throw new NotAllowChangeException();
         }
+        Customer existingCustomer = findContactIfExists(id);
 
-        if (null != customer.getName()) {
-            existingContact.setName(customer.getName());
-        }
-        if (null != customer.getPhone()) {
-            existingContact.setPhone(customer.getPhone());
-        }
-
-
-        Customer updatedContact = customerRepository.save(existingContact);
+        MyBeanUtil.copyNonNullProperties(customer, existingCustomer);
+        Customer updatedContact = customerRepository.save(existingCustomer);
         return new ResponseEntity<>(updatedContact, HttpStatus.OK);
 
 
+    }
+
+    private List<String> filterNotAllowChange(Customer customer) {
+        Field[] fields = Customer.class.getDeclaredFields();
+
+        List<String> notAllowChangeFields = new ArrayList<>();
+        for (Field field : fields) {
+            Object o = MyBeanUtil.getProperty(customer, field.getName());
+            if (null != o && CustomerConfig.NOT_ALLOW_CHANGE.indexOf(field.getName()) >= 0) {
+                notAllowChangeFields.add(field.getName());
+            }
+        }
+
+        return notAllowChangeFields;
     }
 
     @Override
