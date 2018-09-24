@@ -1,5 +1,6 @@
 package free.review.allreview.service;
 
+import free.review.allreview.entity.Customer;
 import free.review.allreview.entity.Goods;
 import org.springframework.http.ResponseEntity;
 
@@ -12,7 +13,7 @@ public interface GoodsService {
 
     ResponseEntity<Goods> createNew(Goods goods, HttpServletRequest request);
 
-    ResponseEntity<Goods> putUpdate(Long id, Goods goods);
+    ResponseEntity<Goods> patchUpdate(Long id, Goods goods);
 
     ResponseEntity<Goods> delete(Long id);
 }

@@ -2,14 +2,13 @@ package free.review.allreview.service;
 
 import free.review.allreview.BusinessConfig.CustomerConfig;
 import free.review.allreview.entity.Customer;
-import free.review.allreview.exceptions.CustomerNotFoundException;
 import free.review.allreview.exceptions.MissingCustomerInfoException;
 import free.review.allreview.exceptions.NotAllowChangeException;
 import free.review.allreview.repository.CustomerRepository;
 import free.review.allreview.utils.MyBeanUtil;
+import free.review.allreview.utils.MyRepositoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,10 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -36,7 +32,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public ResponseEntity<Iterable<Customer>> getAllContactsResponse() {
+    public ResponseEntity<Iterable<Customer>> getAllResponse() {
         Iterable<Customer> allContacts = customerRepository.findAll();
 
         return new ResponseEntity<>(allContacts, HttpStatus.OK);
@@ -44,13 +40,13 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public ResponseEntity<Customer> getSingleContactResponse(Long id) {
-        Customer getContact = findContactIfExists(id);
+    public ResponseEntity<Customer> getOneResponse(Long id) {
+        Customer getContact = findIfExists(id);
         return new ResponseEntity<>(getContact, HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<Customer> createNewContact(Customer customer, HttpServletRequest request) {
+    public ResponseEntity<Customer> createNew(Customer customer, HttpServletRequest request) {
         try {
             Customer newCustomer = customerRepository.save(customer);
             HttpHeaders responseHeaders = new HttpHeaders();
@@ -64,65 +60,29 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public ResponseEntity<Customer> patchUpdateContact(Long id, Customer customer) {
-        List<String> notAllowChange = filterNotAllowChange(customer);
+    public ResponseEntity<Customer> patchUpdate(Long id, Customer customer) {
+        List<String> notAllowChange = MyBeanUtil.filterNotAllowChange(customer, CustomerConfig.NOT_ALLOW_CHANGE);
         if (null != notAllowChange && !notAllowChange.isEmpty()) {
             throw new NotAllowChangeException();
         }
-        Customer existingCustomer = findContactIfExists(id);
+        Customer existingCustomer = findIfExists(id);
 
         MyBeanUtil.copyNonNullProperties(customer, existingCustomer);
-        Customer updatedContact = customerRepository.save(existingCustomer);
-        return new ResponseEntity<>(updatedContact, HttpStatus.OK);
+        Customer updatedCustomer = customerRepository.save(existingCustomer);
 
-
-    }
-
-    private List<String> filterNotAllowChange(Customer customer) {
-        Field[] fields = Customer.class.getDeclaredFields();
-
-        List<String> notAllowChangeFields = new ArrayList<>();
-        for (Field field : fields) {
-            Object o = MyBeanUtil.getProperty(customer, field.getName());
-            if (null != o && CustomerConfig.NOT_ALLOW_CHANGE.indexOf(field.getName()) >= 0) {
-                notAllowChangeFields.add(field.getName());
-            }
-        }
-
-        return notAllowChangeFields;
+        return new ResponseEntity<>(updatedCustomer, HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<Customer> putUpdateContact(Long id, Customer customer) {
-        Customer existingContact = findContactIfExists(id);
+    public ResponseEntity<Customer> delete(Long id) {
 
-        if (isMissingInfo(customer)) {
-            throw new MissingCustomerInfoException();
-        }
-
-        BeanUtils.copyProperties(customer, existingContact);
-        existingContact.setId(id);
-        Customer updatedContact = customerRepository.save(existingContact);
-
-        return new ResponseEntity<>(updatedContact, HttpStatus.OK);
-    }
-
-    @Override
-    public ResponseEntity<Customer> deleteContact(Long id) {
-
-        Customer existingContact = findContactIfExists(id);
+        Customer existingContact = findIfExists(id);
         customerRepository.delete(existingContact);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    private Customer findContactIfExists(Long id) {
-        Optional<Customer> existingContact = customerRepository.findById(id);
-
-        if (existingContact.isPresent()) {
-            return existingContact.get();
-        } else {
-            throw new CustomerNotFoundException();
-        }
+    private Customer findIfExists(Long id) {
+        return MyRepositoryUtil.findIfExists(id, customerRepository);
     }
 
     private boolean isMissingInfo(Customer customer) {

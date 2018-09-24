@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/")
@@ -18,36 +17,36 @@ public class CustomerCtrl {
     // List All Contacts
     @RequestMapping(value = "customers", method = RequestMethod.GET)
     public ResponseEntity<Iterable<Customer>> getAllContacts() throws Throwable {
-        return customerService.getAllContactsResponse();
+        return customerService.getAllResponse();
     }
 
     // List One Customer
     @RequestMapping(value = "customers/{id}", method = RequestMethod.GET)
     public ResponseEntity<Customer> getSingleContact(@PathVariable Long id) throws Throwable {
-        return customerService.getSingleContactResponse(id);
+        return customerService.getOneResponse(id);
     }
 
     // Create New Customer
     @RequestMapping(value = "customers", method = RequestMethod.POST)
     public ResponseEntity<Customer> createNewContact(@RequestBody Customer contact, HttpServletRequest req) {
-        return customerService.createNewContact(contact, req);
+        return customerService.createNew(contact, req);
     }
 
     // Update Customer with PATCH
     @RequestMapping(value = "customers/{id}", method = RequestMethod.PATCH)
     public ResponseEntity<Customer> patchUpdateContact(@PathVariable Long id, @RequestBody Customer contact) {
-        return customerService.patchUpdateContact(id, contact);
+        return customerService.patchUpdate(id, contact);
     }
 
-    // Update Customer with PUT
-    @RequestMapping(value = "customers/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<Customer> putUpdateContact(@PathVariable Long id, @RequestBody Customer contact) {
-        return customerService.putUpdateContact(id, contact);
-    }
+//    // Update Customer with PUT
+//    @RequestMapping(value = "customers/{id}", method = RequestMethod.PUT)
+//    public ResponseEntity<Customer> putUpdate(@PathVariable Long id, @RequestBody Customer contact) {
+//        return customerService.putUpdate(id, contact);
+//    }
 
     // Delete Customer
     @RequestMapping(value = "customers/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Customer> deleteContact(@PathVariable Long id) {
-        return customerService.deleteContact(id);
+        return customerService.delete(id);
     }
 }

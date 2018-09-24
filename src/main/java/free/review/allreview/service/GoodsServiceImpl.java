@@ -1,12 +1,14 @@
 package free.review.allreview.service;
 
+import free.review.allreview.BusinessConfig.GoodsConfig;
 import free.review.allreview.entity.Goods;
 import free.review.allreview.exceptions.ConstraintException;
 import free.review.allreview.exceptions.DuplicatedException;
 import free.review.allreview.exceptions.MissingInfoException;
-import free.review.allreview.exceptions.NotFoundException;
+import free.review.allreview.exceptions.NotAllowChangeException;
 import free.review.allreview.repository.GoodsRepository;
-import org.springframework.beans.BeanUtils;
+import free.review.allreview.utils.MyBeanUtil;
+import free.review.allreview.utils.MyRepositoryUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,7 +18,7 @@ import org.springframework.util.Assert;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
-import java.util.Optional;
+import java.util.List;
 
 @Service
 public class GoodsServiceImpl implements GoodsService {
@@ -52,7 +54,6 @@ public class GoodsServiceImpl implements GoodsService {
             throw new DuplicatedException();
         }
 
-
         Goods newContact = goodsRepository.save(goods);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Location", newContact.getId().toString());
@@ -60,18 +61,16 @@ public class GoodsServiceImpl implements GoodsService {
         return new ResponseEntity<>(newContact, responseHeaders, HttpStatus.CREATED);
     }
 
-
     @Override
-    public ResponseEntity<Goods> putUpdate(Long id, Goods customer) {
-        Goods existingContact = findIfExists(id);
-
-        if (isMissingInfo(customer)) {
-            throw new MissingInfoException();
+    public ResponseEntity<Goods> patchUpdate(Long id, Goods goods) {
+        List<String> notAllowChange = MyBeanUtil.filterNotAllowChange(goods, GoodsConfig.NOT_ALLOW_CHANGE);
+        if (null != notAllowChange && !notAllowChange.isEmpty()) {
+            throw new NotAllowChangeException();
         }
+        Goods existingGoods = findIfExists(id);
 
-        BeanUtils.copyProperties(customer, existingContact);
-        existingContact.setId(id);
-        Goods updatedContact = goodsRepository.save(existingContact);
+        MyBeanUtil.copyNonNullProperties(goods, existingGoods);
+        Goods updatedContact = goodsRepository.save(existingGoods);
 
         return new ResponseEntity<>(updatedContact, HttpStatus.OK);
     }
@@ -91,13 +90,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 
     private Goods findIfExists(Long id) {
-        Optional<Goods> existingContact = goodsRepository.findById(id);
-
-        if (existingContact.isPresent()) {
-            return existingContact.get();
-        } else {
-            throw new NotFoundException();
-        }
+        return MyRepositoryUtil.findIfExists(id, goodsRepository);
     }
 
     private boolean isMissingInfo(Goods goods) {

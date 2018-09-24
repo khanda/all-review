@@ -7,15 +7,13 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface CustomerService {
-    ResponseEntity<Iterable<Customer>> getAllContactsResponse();
+    ResponseEntity<Iterable<Customer>> getAllResponse();
 
-    ResponseEntity<Customer> getSingleContactResponse(Long id);
+    ResponseEntity<Customer> getOneResponse(Long id);
 
-    ResponseEntity<Customer> createNewContact(Customer contact, HttpServletRequest request);
+    ResponseEntity<Customer> createNew(Customer contact, HttpServletRequest request);
 
-    ResponseEntity<Customer> patchUpdateContact(Long id, Customer contactUpdates);
+    ResponseEntity<Customer> patchUpdate(Long id, Customer contactUpdates);
 
-    ResponseEntity<Customer> putUpdateContact(Long id, Customer contactUpdates);
-
-    ResponseEntity<Customer> deleteContact(Long id);
+    ResponseEntity<Customer> delete(Long id);
 }

@@ -31,12 +31,12 @@ public class GoodsPriceCtrl {
     public ResponseEntity<GoodsPrice> createNewContact(@RequestBody GoodsPrice contact, HttpServletRequest req) {
         return goodsPriceService.createNew(contact, req);
     }
-
-    // Update with PUT
-    @RequestMapping(value = "goodsPrices/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<GoodsPrice> putUpdateContact(@PathVariable Long id, @RequestBody GoodsPrice contact) {
-        return goodsPriceService.putUpdate(id, contact);
-    }
+//
+//    // Update with PUT
+//    @RequestMapping(value = "goodsPrices/{id}", method = RequestMethod.PUT)
+//    public ResponseEntity<GoodsPrice> putUpdate(@PathVariable Long id, @RequestBody GoodsPrice contact) {
+//        return goodsPriceService.putUpdate(id, contact);
+//    }
 
     // Delete 
     @RequestMapping(value = "goodsPrices/{id}", method = RequestMethod.DELETE)
