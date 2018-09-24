@@ -5,12 +5,15 @@ import free.review.allreview.listener.GoodsPriceListener;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @EntityListeners(GoodsPriceListener.class)
 public class GoodsPrice implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, columnDefinition = "INT(11)")
     private Long id;
     @Column
     private Float price;

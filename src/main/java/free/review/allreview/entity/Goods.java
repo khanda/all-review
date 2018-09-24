@@ -6,7 +6,8 @@ import java.io.Serializable;
 @Entity
 public class Goods implements Serializable{
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, columnDefinition = "INT(11)")
     private Long id;
     @Column(unique = true)
     private String name;
