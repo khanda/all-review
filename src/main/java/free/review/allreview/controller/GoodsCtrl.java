@@ -32,9 +32,9 @@ public class GoodsCtrl {
         return goodsService.createNew(contact, req);
     }
 
-    // Update with PUT
+    // Update with PATCH
     @RequestMapping(value = "goods/{id}", method = RequestMethod.PATCH)
-    public ResponseEntity<Goods> putUpdate(@PathVariable Long id, @RequestBody Goods goods) {
+    public ResponseEntity<Goods> patchUpdate(@PathVariable Long id, @RequestBody Goods goods) {
         return goodsService.patchUpdate(id, goods);
     }
 

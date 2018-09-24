@@ -1,14 +1,15 @@
 package free.review.allreview.service;
 
+import free.review.allreview.BusinessConfig.GoodsPriceConfig;
 import free.review.allreview.entity.Goods;
 import free.review.allreview.entity.GoodsPrice;
-import free.review.allreview.exceptions.ConstraintException;
 import free.review.allreview.exceptions.DuplicatedException;
 import free.review.allreview.exceptions.MissingInfoException;
-import free.review.allreview.exceptions.NotFoundException;
+import free.review.allreview.exceptions.NotAllowChangeException;
 import free.review.allreview.repository.GoodsPriceRepository;
 import free.review.allreview.repository.GoodsRepository;
-import org.springframework.beans.BeanUtils;
+import free.review.allreview.utils.MyBeanUtil;
+import free.review.allreview.utils.MyRepositoryUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.util.Assert;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -66,26 +68,16 @@ public class GoodsPriceServiceImpl implements GoodsPriceService {
         return new ResponseEntity<>(newContact, responseHeaders, HttpStatus.CREATED);
     }
 
-
     @Override
-    public ResponseEntity<GoodsPrice> putUpdate(Long id, GoodsPrice goodsPrice) {
-        GoodsPrice existingContact = findIfExists(id);
-
-        if (isMissingInfo(goodsPrice)) {
-            throw new MissingInfoException();
+    public ResponseEntity<GoodsPrice> patchUpdate(Long id, GoodsPrice goodsPrice) {
+        List<String> notAllowChange = MyBeanUtil.filterNotAllowChange(goodsPrice, GoodsPriceConfig.NOT_ALLOW_CHANGE);
+        if (null != notAllowChange && !notAllowChange.isEmpty()) {
+            throw new NotAllowChangeException();
         }
+        GoodsPrice existingGoods = findIfExists(id);
 
-        Optional<Goods> goods = goodsRepository.findById(goodsPrice.getTransientGoodsId());
-        if (goods.isPresent()) {
-            goodsPrice.setGoods(goods.get());
-        } else {
-            throw new MissingInfoException();
-        }
-
-
-        BeanUtils.copyProperties(goodsPrice, existingContact);
-        existingContact.setId(id);
-        GoodsPrice updatedContact = goodsPriceRepository.save(existingContact);
+        MyBeanUtil.copyNonNullProperties(goodsPrice, existingGoods);
+        GoodsPrice updatedContact = goodsPriceRepository.save(existingGoods);
 
         return new ResponseEntity<>(updatedContact, HttpStatus.OK);
     }
@@ -100,13 +92,7 @@ public class GoodsPriceServiceImpl implements GoodsPriceService {
 
 
     private GoodsPrice findIfExists(Long id) {
-        Optional<GoodsPrice> existingContact = goodsPriceRepository.findById(id);
-
-        if (existingContact.isPresent()) {
-            return existingContact.get();
-        } else {
-            throw new NotFoundException();
-        }
+        return MyRepositoryUtil.findIfExists(id, goodsPriceRepository);
     }
 
     private boolean isMissingInfo(GoodsPrice goodsPrice) {

@@ -12,7 +12,7 @@ public interface DailyBillItemService {
 
     ResponseEntity<DailyBillItem> createNew(DailyBillItem goodsPrice, HttpServletRequest request);
 
-    ResponseEntity<DailyBillItem> putUpdate(Long id, DailyBillItem goodsPrice);
+    ResponseEntity<DailyBillItem> patchUpdate(Long id, DailyBillItem dailyBillItem);
 
     ResponseEntity<DailyBillItem> delete(Long id);
 }

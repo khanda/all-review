@@ -32,10 +32,10 @@ public class DailyBillItemCtrl {
         return dailyBillItemService.createNew(contact, req);
     }
 
-    // Update with PUT
-    @RequestMapping(value = "dailyBillItem/{id}", method = RequestMethod.PUT)
+    // Update with PATCH
+    @RequestMapping(value = "dailyBillItem/{id}", method = RequestMethod.PATCH)
     public ResponseEntity<DailyBillItem> putUpdateContact(@PathVariable Long id, @RequestBody DailyBillItem contact) {
-        return dailyBillItemService.putUpdate(id, contact);
+        return dailyBillItemService.patchUpdate(id, contact);
     }
 
     // Delete 

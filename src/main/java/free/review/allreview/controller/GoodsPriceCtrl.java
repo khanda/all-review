@@ -16,31 +16,31 @@ public class GoodsPriceCtrl {
 
     // List All
     @RequestMapping(value = "goodsPrices", method = RequestMethod.GET)
-    public ResponseEntity<Iterable<GoodsPrice>> getAllContacts() {
+    public ResponseEntity<Iterable<GoodsPrice>> getAll() {
         return goodsPriceService.getAllResponse();
     }
 
     // List One
     @RequestMapping(value = "goodsPrices/{id}", method = RequestMethod.GET)
-    public ResponseEntity<GoodsPrice> getSingleContact(@PathVariable Long id) {
+    public ResponseEntity<GoodsPrice> getOne(@PathVariable Long id) {
         return goodsPriceService.getOneResponse(id);
     }
 
     // Create New
     @RequestMapping(value = "goodsPrices", method = RequestMethod.POST)
-    public ResponseEntity<GoodsPrice> createNewContact(@RequestBody GoodsPrice contact, HttpServletRequest req) {
-        return goodsPriceService.createNew(contact, req);
+    public ResponseEntity<GoodsPrice> createNew(@RequestBody GoodsPrice goodsPrice, HttpServletRequest req) {
+        return goodsPriceService.createNew(goodsPrice, req);
     }
-//
-//    // Update with PUT
-//    @RequestMapping(value = "goodsPrices/{id}", method = RequestMethod.PUT)
-//    public ResponseEntity<GoodsPrice> putUpdate(@PathVariable Long id, @RequestBody GoodsPrice contact) {
-//        return goodsPriceService.putUpdate(id, contact);
-//    }
+
+    // Update with PATCH
+    @RequestMapping(value = "goodsPrices/{id}", method = RequestMethod.PATCH)
+    public ResponseEntity<GoodsPrice> putUpdate(@PathVariable Long id, @RequestBody GoodsPrice goodsPrice) {
+        return goodsPriceService.patchUpdate(id, goodsPrice);
+    }
 
     // Delete 
     @RequestMapping(value = "goodsPrices/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<GoodsPrice> deleteContact(@PathVariable Long id) {
+    public ResponseEntity<GoodsPrice> delete(@PathVariable Long id) {
         return goodsPriceService.delete(id);
     }
 }

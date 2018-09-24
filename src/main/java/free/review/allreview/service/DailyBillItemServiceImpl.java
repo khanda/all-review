@@ -1,15 +1,17 @@
 package free.review.allreview.service;
 
+import free.review.allreview.BusinessConfig.DailyBillItemConfig;
 import free.review.allreview.entity.Customer;
 import free.review.allreview.entity.DailyBillItem;
 import free.review.allreview.entity.GoodsPrice;
 import free.review.allreview.exceptions.DuplicatedException;
 import free.review.allreview.exceptions.MissingInfoException;
+import free.review.allreview.exceptions.NotAllowChangeException;
 import free.review.allreview.exceptions.NotFoundException;
 import free.review.allreview.repository.CustomerRepository;
 import free.review.allreview.repository.DailyBillItemRepository;
 import free.review.allreview.repository.GoodsPriceRepository;
-import org.springframework.beans.BeanUtils;
+import free.review.allreview.utils.MyBeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import org.springframework.util.Assert;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -84,26 +87,15 @@ public class DailyBillItemServiceImpl implements DailyBillItemService {
 
 
     @Override
-    public ResponseEntity<DailyBillItem> putUpdate(Long id, DailyBillItem dailyBillItem) {
-        DailyBillItem existingContact = findIfExists(id);
-
-        if (isMissingInfo(dailyBillItem)) {
-            throw new MissingInfoException();
+    public ResponseEntity<DailyBillItem> patchUpdate(Long id, DailyBillItem dailyBillItem) {
+        List<String> notAllowChange = MyBeanUtil.filterNotAllowChange(dailyBillItem, DailyBillItemConfig.NOT_ALLOW_CHANGE);
+        if (null != notAllowChange && !notAllowChange.isEmpty()) {
+            throw new NotAllowChangeException();
         }
+        DailyBillItem existingGoods = findIfExists(id);
 
-        Optional<GoodsPrice> goods = goodsPriceRepository.findById(dailyBillItem.getGoodsPrice().getId());
-        Optional<Customer> customer = customerRepository.findById(dailyBillItem.getCustomer().getId());
-        if (goods.isPresent() && customer.isPresent()) {
-            dailyBillItem.setGoodsPrice(goods.get());
-            dailyBillItem.setCustomer(customer.get());
-        } else {
-            throw new MissingInfoException();
-        }
-
-
-        BeanUtils.copyProperties(dailyBillItem, existingContact);
-        existingContact.setId(id);
-        DailyBillItem updatedContact = dailyBillItemRepository.save(existingContact);
+        MyBeanUtil.copyNonNullProperties(dailyBillItem, existingGoods);
+        DailyBillItem updatedContact = dailyBillItemRepository.save(existingGoods);
 
         return new ResponseEntity<>(updatedContact, HttpStatus.OK);
     }
