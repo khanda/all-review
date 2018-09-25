@@ -1,11 +1,10 @@
 package free.review.allreview.controller;
 
+import free.review.allreview.ParamHandler.ParamHandler;
 import free.review.allreview.entity.Customer;
-import free.review.allreview.exceptions.MissingInfoException;
 import free.review.allreview.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -16,22 +15,18 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("api/v1/")
 public class CustomerCtrl {
+    private final CustomerService customerService;
+
     @Autowired
-    private CustomerService customerService;
+    public CustomerCtrl(CustomerService customerService) {
+        this.customerService = customerService;
+    }
 
     // List All Contacts
     @RequestMapping(value = "customers", method = RequestMethod.GET)
     public ResponseEntity<Page<Customer>> getAllContacts(@RequestParam Integer page, @RequestParam Integer limit) throws Throwable {
-        if (null == page || page <= 0) {
-            throw new MissingInfoException();
-        }
-        if (page > 0) {
-            page--;
-        }
-
-        Pageable pageable = new PageRequest(page, limit, Sort.Direction.ASC, "name");
-//        new Sort(Sort.Direction.DESC, "description")
-//                .and(new Sort(Sort.Direction.ASC, "title")
+        Pageable pageable = ParamHandler.createPageable(page, limit, new Sort(Sort.Direction.ASC, "name"));
+//        new Sort(Sort.Direction.DESC, "description").and(new Sort(Sort.Direction.ASC, "title")
         return customerService.getAllResponse(pageable);
     }
 

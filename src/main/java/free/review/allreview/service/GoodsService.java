@@ -2,12 +2,14 @@ package free.review.allreview.service;
 
 import free.review.allreview.entity.Customer;
 import free.review.allreview.entity.Goods;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
 
 public interface GoodsService {
-    ResponseEntity<Iterable<Goods>> getAllResponse();
+    ResponseEntity<Page<Goods>> getAllResponse(Pageable pageable);
 
     ResponseEntity<Goods> getOneResponse(Long id);
 

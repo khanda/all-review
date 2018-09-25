@@ -10,6 +10,8 @@ import free.review.allreview.repository.GoodsRepository;
 import free.review.allreview.utils.MyBeanUtil;
 import free.review.allreview.utils.MyRepositoryUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,10 +34,10 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public ResponseEntity<Iterable<Goods>> getAllResponse() {
-        Iterable<Goods> allContacts = goodsRepository.findAll();
+    public ResponseEntity<Page<Goods>> getAllResponse(Pageable pageable) {
+        Page<Goods> goods = goodsRepository.findAll(pageable);
 
-        return new ResponseEntity<>(allContacts, HttpStatus.OK);
+        return new ResponseEntity<>(goods, HttpStatus.OK);
 
     }
 

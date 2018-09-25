@@ -1,8 +1,12 @@
 package free.review.allreview.controller;
 
+import free.review.allreview.ParamHandler.ParamHandler;
 import free.review.allreview.entity.Goods;
 import free.review.allreview.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,8 +20,9 @@ public class GoodsCtrl {
 
     // List All
     @RequestMapping(value = "goods", method = RequestMethod.GET)
-    public ResponseEntity<Iterable<Goods>> getAll() {
-        return goodsService.getAllResponse();
+    public ResponseEntity<Page<Goods>> getAll(@RequestParam Integer page, @RequestParam Integer limit) {
+        Pageable pageable = ParamHandler.createPageable(page, limit, new Sort(Sort.Direction.ASC, "name"));
+        return goodsService.getAllResponse(pageable);
     }
 
     // List One
