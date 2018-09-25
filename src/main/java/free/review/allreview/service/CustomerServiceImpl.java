@@ -10,6 +10,8 @@ import free.review.allreview.utils.MyRepositoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +34,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public ResponseEntity<Iterable<Customer>> getAllResponse() {
-        Iterable<Customer> allContacts = customerRepository.findAll();
+    public ResponseEntity<Page<Customer>> getAllResponse(Pageable pageRequest) {
+        Page<Customer> allContacts = customerRepository.findAll(pageRequest);
 
         return new ResponseEntity<>(allContacts, HttpStatus.OK);
 
