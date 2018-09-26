@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface CustomerService {
-    ResponseEntity<Page<Customer>> getAllResponse(Pageable pageRequest, List<Specification<Customer>> specs);
+    ResponseEntity<Page<Customer>> getAllResponse(Pageable pageRequest, Specification<Customer> spec);
 
     ResponseEntity<Customer> getOneResponse(Long id);
 

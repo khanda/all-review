@@ -5,6 +5,7 @@ import free.review.allreview.entity.Customer;
 import free.review.allreview.exceptions.MissingCustomerInfoException;
 import free.review.allreview.exceptions.NotAllowChangeException;
 import free.review.allreview.repository.CustomerRepository;
+import free.review.allreview.specification.CustomerSpecificationsBuilder;
 import free.review.allreview.utils.MyBeanUtil;
 import free.review.allreview.utils.MyRepositoryUtil;
 import org.slf4j.Logger;
@@ -21,6 +22,8 @@ import org.springframework.util.Assert;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -35,12 +38,10 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public ResponseEntity<Page<Customer>> getAllResponse(Pageable pageRequest, List<Specification<Customer>> specs) {
-
-        Page<Customer> allContacts = customerRepository.findAll(Specification.where(specs.get(0)).and(specs.get(1)), pageRequest);
+    public ResponseEntity<Page<Customer>> getAllResponse(Pageable pageRequest, Specification<Customer> spec) {
+        Page<Customer> allContacts = customerRepository.findAll(spec, pageRequest);
 
         return new ResponseEntity<>(allContacts, HttpStatus.OK);
-
     }
 
     @Override

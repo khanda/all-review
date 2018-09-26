@@ -5,15 +5,19 @@ import free.review.allreview.criteria.SearchCriteria;
 import free.review.allreview.entity.Customer;
 import free.review.allreview.service.CustomerService;
 import free.review.allreview.specification.CustomerSpecification;
+import free.review.allreview.specification.CustomerSpecificationsBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("api/v1/")
@@ -29,14 +33,18 @@ public class CustomerCtrl {
     @RequestMapping(value = "customers", method = RequestMethod.GET)
     public ResponseEntity<Page<Customer>> getAllContacts(@RequestParam Integer page,
                                                          @RequestParam Integer limit,
-                                                         @RequestParam String name,
-                                                         @RequestParam String phone
-    ) {
-        CustomerSpecification specName = new CustomerSpecification(new SearchCriteria("name", ":", name));
-        CustomerSpecification specPhone = new CustomerSpecification(new SearchCriteria("phone", ":", phone));
+                                                         @RequestParam String search) {
+        CustomerSpecificationsBuilder builder = new CustomerSpecificationsBuilder();
+        Pattern pattern = Pattern.compile("(\\w+?)(:|<|>)(\\w+?),");
+        Matcher matcher = pattern.matcher(search + ",");
+        while (matcher.find()) {
+            builder.with(matcher.group(1), matcher.group(2), matcher.group(3));
+        }
+
+        Specification<Customer> spec = builder.build();
 
         Pageable pageable = ParamHandler.createPageable(page, limit, new Sort(Sort.Direction.ASC, "name"));
-        return customerService.getAllResponse(pageable, Arrays.asList(specName, specPhone));
+        return customerService.getAllResponse(pageable, spec);
     }
 
     // List One Customer
