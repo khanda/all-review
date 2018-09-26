@@ -3,12 +3,14 @@ package free.review.allreview.service;
 import free.review.allreview.entity.Customer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 public interface CustomerService {
-    ResponseEntity<Page<Customer>> getAllResponse(Pageable pageRequest);
+    ResponseEntity<Page<Customer>> getAllResponse(Pageable pageRequest, List<Specification<Customer>> specs);
 
     ResponseEntity<Customer> getOneResponse(Long id);
 

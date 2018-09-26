@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +35,9 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public ResponseEntity<Page<Customer>> getAllResponse(Pageable pageRequest) {
-        Page<Customer> allContacts = customerRepository.findAll(pageRequest);
+    public ResponseEntity<Page<Customer>> getAllResponse(Pageable pageRequest, List<Specification<Customer>> specs) {
+
+        Page<Customer> allContacts = customerRepository.findAll(Specification.where(specs.get(0)).and(specs.get(1)), pageRequest);
 
         return new ResponseEntity<>(allContacts, HttpStatus.OK);
 
